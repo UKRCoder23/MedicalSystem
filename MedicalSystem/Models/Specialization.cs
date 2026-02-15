@@ -1,0 +1,8 @@
+namespace MedicalSystem.Models
+{
+    public class Specialization
+    {
+        public int Id { get; set; }
+        public string NameSpecialization { get; set; }
+    }
+}
