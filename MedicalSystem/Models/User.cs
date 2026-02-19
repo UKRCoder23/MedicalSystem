@@ -1,3 +1,5 @@
+using MedicalSystem.Enums;
+
 namespace MedicalSystem.Models
 {
     public abstract class User

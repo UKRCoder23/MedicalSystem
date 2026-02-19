@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using MedicalSystem.Enums;
 
 namespace MedicalSystem.Models
 {
@@ -8,9 +9,9 @@ namespace MedicalSystem.Models
        public int Cabinet { get; set; }
        public string Biography {get; set; }
        public double Rating { get; set; }
-       public virtual ICollection<Specialization> Specializations { get; set; } = new List<Specialization>();
-       public virtual ICollection<Service> Services { get; set; } = new List<Service>();
-       public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
-       public virtual ICollection<Appointment> DoctorAppointments { get; set; } = new List<Appointment>();
+       public ICollection<Specialization> Specializations { get; set; } = new List<Specialization>();
+       public ICollection<Service> Services { get; set; } = new List<Service>();
+       public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+       public ICollection<Appointment> DoctorAppointments { get; set; } = new List<Appointment>();
     }
 }

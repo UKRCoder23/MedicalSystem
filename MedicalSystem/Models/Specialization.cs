@@ -3,6 +3,7 @@ namespace MedicalSystem.Models
     public class Specialization
     {
         public int Id { get; set; }
-        public string NameSpecialization { get; set; }
+        public string NameSpecialization { get; set; } = string.Empty;
+        public ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
 }
