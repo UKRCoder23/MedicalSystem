@@ -7,17 +7,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MedicalSystem.Controllers
 {
-    public class AccountController : Controller
+    public class AuthController : Controller
     {
         private readonly AppDbContext _context;
 
-        public AccountController(AppDbContext context)
+        public AuthController(AppDbContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public IActionResult RegisterPatient() => View();
+        public IActionResult Registration() => View();
+
+        [HttpGet]
+        public IActionResult RegisterPatient() 
+        {
+            return View(new RegisterPatientViewModel());
+        }
 
         [HttpPost]
         public async Task<IActionResult> RegisterPatient(RegisterPatientViewModel model)
@@ -27,11 +33,11 @@ namespace MedicalSystem.Controllers
                 var patient = new Patient
                 {
                     Email = model.Email,
-                    HashPassword = model.HashPassword, 
+                    HashPassword = model.Password, 
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     PhoneNumber = model.Phone, 
-                    Gender = model.Gender
+                    UserGender = model.Gender
                 };
 
                 _context.Patients.Add(patient);
@@ -45,7 +51,7 @@ namespace MedicalSystem.Controllers
         public async Task<IActionResult> RegisterDoctor()
         {
             ViewBag.Specializations = await _context.Specializations.ToListAsync();
-            return View();
+            return View(new RegisterDoctorViewModel());
         }
 
         [HttpPost]
@@ -56,11 +62,11 @@ namespace MedicalSystem.Controllers
                 var doctor = new Doctor
                 {
                     Email = model.Email,
-                    HashPassword = model.HashPassword, 
+                    HashPassword = model.Password, 
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     PhoneNumber = model.Phone, 
-                    Gender = model.Gender,
+                    UserGender = model.Gender,
                     IsApproved = false,
                     Specializations = await _context.Specializations
                         .Where(s => model.SelectedSpecializationIds.Contains(s.Id))
