@@ -5,6 +5,7 @@ namespace MedicalSystem.Models
 {
     public class Doctor : User
     {
+       public byte[]? Photo { get; set; }
        public DoctorStatus DoctorStatus { get; set; }
        public bool IsApproved { get; set; }
        public int Cabinet { get; set; }

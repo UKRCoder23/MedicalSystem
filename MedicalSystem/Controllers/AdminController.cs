@@ -15,14 +15,12 @@ namespace MedicalSystem.Controllers
         {
             _context = context;
         }
-        
+
         [HttpGet]
-        public async Task<IActionResult> AdminApproveList()
+        public async Task<IActionResult> AdminPanel()
         {
-            var pendingDoctors = await _context.Doctors
-                .Where(d => !d.IsApproved)
-                .ToListAsync();
-            return View(pendingDoctors);
+            var doctors = await _context.Doctors.ToListAsync();
+            return View(doctors);
         }
 
         [HttpPost]
@@ -34,8 +32,18 @@ namespace MedicalSystem.Controllers
                 doctor.IsApproved = true;
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(AdminApproveList));
+            return RedirectToAction(nameof(AdminPanel));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteDoctor(int id)
+        {
+            var doctor = await _context.Doctors.FindAsync(id);
+            if (doctor != null) {
+                _context.Doctors.Remove(doctor);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(AdminPanel));
         }
     }
-    
 }

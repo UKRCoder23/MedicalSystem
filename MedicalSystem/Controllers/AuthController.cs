@@ -4,6 +4,8 @@ using MedicalSystem.Data;
 using MedicalSystem.Models;
 using MedicalSystem.Models.ViewModels;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace MedicalSystem.Controllers
 {
@@ -76,10 +78,67 @@ namespace MedicalSystem.Controllers
                 _context.Doctors.Add(doctor);
                 await _context.SaveChangesAsync();
 
-                return View("RegistrationPending");
+                TempData["SuccessMessage"] = "Дякуємо! Ваша заявка прийнята. Будь ласка, зачекайте на підтвердження адміністратора.";
             }
             ViewBag.Specializations = await _context.Specializations.ToListAsync();
+            return RedirectToAction(nameof(RegisterDoctor));
+        }
+
+        [HttpGet]
+        public IActionResult Login() => View(new LoginViewModel());
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var patient = await _context.Patients
+                    .FirstOrDefaultAsync(p => p.Email == model.Email && p.HashPassword == model.Password);
+
+                if (patient != null)
+                {
+                    await Authenticate(patient.Email, "Patient");
+                    return RedirectToAction("Index", "Home"); 
+                }
+
+                var doctor = await _context.Doctors
+                    .FirstOrDefaultAsync(d => d.Email == model.Email && d.HashPassword == model.Password);
+
+                if (doctor != null)
+                {
+                    if (!doctor.IsApproved)
+                    {
+                        ModelState.AddModelError("", "Ваш акаунт ще не підтверджено адміністратором.");
+                        return View(model);
+                    }
+                    
+                    await Authenticate(doctor.Email, "Doctor");
+                    return RedirectToAction("IndexDoctor", "Home");
+                }
+
+                ModelState.AddModelError("", "Невірний email або пароль");
+            }
             return View(model);
+        }
+
+        private async Task Authenticate(string email, string role)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, email),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+
+            await HttpContext.SignInAsync("Cookies",
+                new ClaimsPrincipal(claimsIdentity),
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddDays(7)
+                });
         }
     }
 }

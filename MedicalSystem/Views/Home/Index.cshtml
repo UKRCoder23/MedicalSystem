@@ -1,7 +1,78 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<MedicalSystem.Models.Doctor>
+
+@{
+    ViewData["Title"] = "Головна сторінка";
 }
 
-<div class="text-center">
+<div class="text-center mt-4">
     <h1 class="display-4">Welcome</h1>
+</div>
+
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Знайдіть свого лікаря</h2>
+
+    <div class="card shadow-sm border-0 mb-4 p-3 bg-light">
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="searchName" class="form-control" placeholder="Прізвище лікаря..." value="@Context.Request.Query["searchName"]">
+            </div>
+            <div class="col-md-4">
+                <select name="specializationId" class="form-select">
+                    <option value="">Всі спеціалізації</option>
+                    @if (ViewBag.Specializations != null)
+                    {
+                        foreach (var spec in ViewBag.Specializations)
+                        {
+                            bool isSelected = Context.Request.Query["specializationId"] == spec.Id.ToString();
+                            <!option value="@spec.Id" @(isSelected ? "selected" : "")>@spec.NameSpecialization</!option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Знайти</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+        <a href="/Services" class="btn btn-outline-info px-4 shadow-sm">Доступні послуги</a>
+        <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-secondary px-4">Особистий кабінет</a>
+    </div>
+
+    <hr class="mb-5">
+
+    @if (Model != null && Model.Any())
+    {
+        <h3 class="mb-4">Результати пошуку:</h3>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var doctor in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-start border-primary border-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">@doctor.LastName @doctor.FirstName</h5>
+                            <p class="text-primary mb-2 small fw-bold">
+                                @string.Join(", ", doctor.Specializations.Select(s => s.NameSpecialization))
+                            </p>
+                            <div class="mt-3">
+                                <a href="/Home/DoctorDetails/@doctor.Id" class="btn btn-sm btn-primary">
+                                    Переглянути графік 
+                                </a>
+                                <a href="/Home/DoctorDetails/@doctor.Id" class="btn btn-sm btn-primary">
+                                    Переглянути біографію 
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Context.Request.Query["searchName"]) || !string.IsNullOrEmpty(Context.Request.Query["specializationId"]))
+    {
+        <div class="alert alert-warning text-center">
+            За вашим запитом лікарів не знайдено. Спробуйте змінити параметри пошуку.
+        </div>
+    }
 </div>

@@ -1,0 +1,9 @@
+@model MedicalSystem.Models.Doctor
+
+<div class="text-center">
+    <h1 class="display-4">Вітаємо, лікарю @Model.FirstName!</h1>
+</div>
+
+<div class="mt-4 text-center">
+    <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-secondary px-4">Особистий кабінет</a>
+</div>

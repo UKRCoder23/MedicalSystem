@@ -1,0 +1,46 @@
+@model MedicalSystem.Models.Doctor
+
+<div class="card shadow-sm p-4">
+    <h4>Редагувати профіль</h4>
+    <form asp-action="UpdateDoctorProfile" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Біографія</label>
+                <textarea name="biography" class="form-control" rows="3">@Model.Biography</textarea>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Спеціалізації</label>
+                <div class="border p-2 rounded bg-white">
+                    @foreach (var spec in (IEnumerable<MedicalSystem.Models.Specialization>)ViewBag.AllSpecializations)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="selectedSpecializationIds" 
+                                   value="@spec.Id" @(Model.Specializations.Any(s => s.Id == spec.Id) ? "checked" : "")>
+                            <label class="form-check-label">@spec.NameSpecialization</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Телефон</label>
+                <input type="text" name="phone" class="form-control" value="@Model.PhoneNumber">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Кабінет</label>
+                <input type="number" name="cabinet" class="form-control" value="@Model.Cabinet">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Змінити фото</label>
+                <input type="file" name="photoFile" class="form-control" accept="image/*">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Зберегти всі зміни</button>
+    </form>
+    <div class="mt-3">
+    <a asp-controller="Home" asp-action="IndexDoctor" class="btn btn-secondary">
+        Назад
+    </a>
+    </div>
+</div>
