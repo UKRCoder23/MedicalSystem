@@ -57,4 +57,26 @@ public class HomeController : Controller
         }
         return View("IndexDoctor", doctor); 
     }
+
+    public async Task<IActionResult> DoctorDetails(int id)
+    {
+        var doctor = await _context.Doctors
+            .Include(d => d.Specializations)
+            .FirstOrDefaultAsync(d => d.Id == id);
+
+        if (doctor == null) return NotFound();
+
+        return View(doctor);
+    }
+
+    public async Task<IActionResult> DoctorSchedules(int id)
+    {
+        var doctor = await _context.Doctors
+            .Include(d => d.Schedules) 
+            .FirstOrDefaultAsync(d => d.Id == id);
+
+        if (doctor == null) return NotFound();
+
+        return View(doctor);
+    }
 }

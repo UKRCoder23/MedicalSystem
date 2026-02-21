@@ -19,7 +19,7 @@ namespace MedicalSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> AdminPanel()
         {
-            var doctors = await _context.Doctors.ToListAsync();
+            var doctors = await _context.Doctors.Include(d => d.Schedules).ToListAsync();
             return View(doctors);
         }
 
@@ -43,6 +43,26 @@ namespace MedicalSystem.Controllers
                 _context.Doctors.Remove(doctor);
                 await _context.SaveChangesAsync();
             }
+            return RedirectToAction(nameof(AdminPanel));
+        }
+        [HttpPost]
+        public async Task<IActionResult> SetSchedule(int doctorId, List<DayOfWeek> selectedDays, TimeSpan start, TimeSpan end)
+        {
+            var oldSchedules = _context.Schedules.Where(s => s.DoctorId == doctorId);
+            _context.Schedules.RemoveRange(oldSchedules);
+
+            foreach (var day in selectedDays)
+            {
+                _context.Schedules.Add(new Schedule
+                {
+                    DoctorId = doctorId,
+                    Day = day,
+                    StartTime = start,
+                    EndTime = end
+                });
+            }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(AdminPanel));
         }
     }

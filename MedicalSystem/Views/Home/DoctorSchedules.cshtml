@@ -1,0 +1,67 @@
+@model MedicalSystem.Models.Doctor
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Графік прийому: @Model.FirstName @Model.LastName</h2>
+        <span class="badge bg-primary fs-6">Кабінет №@Model.Cabinet</span>
+    </div>
+    
+    <hr />
+
+    @if (Model.Schedules != null && Model.Schedules.Any())
+    {
+        <div class="card shadow-sm">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>День тижня</th>
+                        <th>Години прийому</th>
+                        <th class="text-end">Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Schedules.OrderBy(s => s.Day))
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                <strong>@TranslateDay(item.Day)</strong>
+                            </td>
+                            <td class="align-middle">
+                                @item.StartTime.ToString(@"hh\:mm") — @item.EndTime.ToString(@"hh\:mm")
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-success btn-sm px-4">Записатись</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm">
+            <i class="bi bi-info-circle me-2"></i> Графік для цього лікаря ще не заповнений.
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="DoctorDetails" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад до опису
+        </a>
+    </div>
+</div>
+
+@functions {
+    string TranslateDay(DayOfWeek day) => day switch
+    {
+        DayOfWeek.Monday    => "Понеділок",
+        DayOfWeek.Tuesday   => "Вівторок",
+        DayOfWeek.Wednesday => "Середа",
+        DayOfWeek.Thursday  => "Четвер",
+        DayOfWeek.Friday    => "П'ятниця",
+        DayOfWeek.Saturday  => "Субота",
+        DayOfWeek.Sunday    => "Неділя",
+        _ => day.ToString()
+    };
+}
